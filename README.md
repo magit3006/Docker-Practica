@@ -31,13 +31,7 @@ volumen `db_data`):
 docker compose down
 ```
 
-## Captura de pantalla
 
-_(añade aquí una imagen, por ejemplo `docs/screenshot.png`, y enlázala así)_
-
-```markdown
-![Resultado](docs/screenshot.png)
-```
 
 ## Estructura del repositorio
 

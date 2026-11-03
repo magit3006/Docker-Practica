@@ -1,48 +1,70 @@
-# Stack LAMP con Docker (nginx + PHP-FPM + MySQL)
+# Docker Practica
 
-Entorno de desarrollo con tres contenedores independientes, en lugar de un
-único paquete tipo XAMPP: cada servicio (servidor web, PHP y base de datos)
-vive aislado en su propio contenedor y se comunica con los demás a través
-de una red de Docker.
+Entorno web en contenedores con Nginx y PHP-FPM, además de MySQL y
+phpMyAdmin.
 
-## Arquitectura
+## Requisitos
 
-- **web** (`nginx:1.27-alpine`): recibe las peticiones HTTP en el puerto
-  `8080` y reenvía las peticiones `.php` al contenedor `php` por FastCGI.
-- **php** (`php:8.3-fpm-alpine`, construido desde `php/Dockerfile`): ejecuta
-  el código de `src/`, incluida la extensión `pdo_mysql`.
-- **db** (`mysql:8.0`): almacena los datos. `src/index.php` se conecta con
-  PDO, crea una tabla de ejemplo y cuenta las visitas.
+- Docker Desktop con Docker Compose habilitado.
+- Puerto `8080` disponible para la aplicación y `8081` para phpMyAdmin.
 
-## Cómo levantarlo
+## Iniciar los servicios
 
-```bash
-git clone <url-de-tu-repo>
-cd lamp-docker
-docker compose up -d
+Desde la carpeta del proyecto, ejecuta:
+
+```powershell
+docker compose up --build -d
 ```
 
-Y abre [http://localhost:8080](http://localhost:8080) en el navegador.
+- Aplicación: [http://localhost:8080](http://localhost:8080)
+- phpMyAdmin: [http://localhost:8081](http://localhost:8081)
 
-Para parar y borrar los contenedores (conservando los datos de MySQL en el
-volumen `db_data`):
+Para consultar los registros:
 
-```bash
+```powershell
+docker compose logs -f
+```
+
+Para detener los contenedores:
+
+```powershell
 docker compose down
 ```
 
+Los datos de MySQL se conservan en el volumen `db_data`. Para eliminarlos
+también, ejecuta `docker compose down -v`.
 
+## Servicios
 
-## Estructura del repositorio
+- **web**: Nginx, expuesto en el puerto `8080`.
+- **php**: PHP-FPM 8.3 con las extensiones PDO y `pdo_mysql`.
+- **db**: MySQL 8.0.
+- **phpmyadmin**: interfaz de administración de MySQL, expuesta en el puerto
+  `8081`.
 
-```
+El punto de entrada actual, `src/index.php`, redirige a
+`/forja-heroes/src/ficha.php`. La configuración de PHP también referencia
+`src/forja-heroes/php/forja.ini`. Esos archivos no están incluidos en este
+repositorio en este momento; agrega la aplicación y el archivo de
+configuración correspondientes para que la página funcione correctamente.
+
+## Estructura
+
+```text
 .
 ├── docker-compose.yml
-├── php/
-│   └── Dockerfile
 ├── nginx/
 │   └── default.conf
+├── php/
+│   └── Dockerfile
 ├── src/
 │   └── index.php
 └── README.md
 ```
+
+## Configuración
+
+Los puertos, servicios y credenciales de la base de datos se definen en
+`docker-compose.yml`. Antes de publicar o usar este proyecto fuera de un
+entorno local, reemplaza las credenciales de ejemplo y evita guardar
+contraseñas reales en el repositorio.
